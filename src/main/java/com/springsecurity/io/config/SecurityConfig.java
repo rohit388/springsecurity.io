@@ -64,4 +64,10 @@ public class SecurityConfig {
         provider.setUserDetailsService(userDetailsService);
         return provider;
     }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
 }

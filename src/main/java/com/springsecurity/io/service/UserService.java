@@ -1,5 +1,6 @@
 package com.springsecurity.io.service;
 
+import com.springsecurity.io.dto.LoginRequest;
 import com.springsecurity.io.entity.Users;
 import com.springsecurity.io.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class UserService {
       return  userRepository.save(users);
     }
 
-    public String verify(Users users) {
+    public String verify(LoginRequest users) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(users.getUsername(),users.getPassword()));
         if(authentication.isAuthenticated()){
            return jwtService.generateToken(users.getUsername());

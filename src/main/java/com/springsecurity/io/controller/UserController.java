@@ -1,5 +1,6 @@
 package com.springsecurity.io.controller;
 
+import com.springsecurity.io.dto.LoginRequest;
 import com.springsecurity.io.entity.Users;
 import com.springsecurity.io.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody Users users){
+    public String login(@RequestBody LoginRequest users){
         return userService.verify(users);
     }
 

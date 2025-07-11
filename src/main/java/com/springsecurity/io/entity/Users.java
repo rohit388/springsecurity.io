@@ -1,5 +1,6 @@
 package com.springsecurity.io.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -11,34 +12,18 @@ public class Users {
     @Id
     private int id;
     @Column(name="username")
-    private String userName;
+    private String username;
     @Column(name="password")
     private String password;
 
-    public Users(int id, String userName, String password) {
+    public Users(int id, String username, String password) {
         this.id = id;
-        this.userName = userName;
+        this.username = username;
         this.password = password;
     }
 
-    public Users(){
+    public Users() {
 
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
     public int getId() {
@@ -49,12 +34,26 @@ public class Users {
         this.id = id;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public String toString() {
         return "Users{" +
-                "id=" + id +
-                ", userName='" + userName + '\'' +
-                ", password='" + password + '\'' +
+                "id=" + id +", username='" + username + '\'' +", password='" + password + '\'' +
                 '}';
     }
 }

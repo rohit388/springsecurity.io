@@ -17,7 +17,7 @@ public class UserServiceImple implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        Users users = userRepository.findByUserName(username);
+        Users users = userRepository.findByUsername(username);
         if(users==null){
             System.out.println("User not found");
             throw new UsernameNotFoundException("User not found");

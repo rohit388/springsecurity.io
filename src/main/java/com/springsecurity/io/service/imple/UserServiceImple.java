@@ -1,18 +1,29 @@
 package com.springsecurity.io.service.imple;
 
+import com.springsecurity.io.dto.UserRequest;
 import com.springsecurity.io.entity.Users;
+import com.springsecurity.io.mapper.UserMapper;
 import com.springsecurity.io.model.UserPrincipal;
 import com.springsecurity.io.repo.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.springsecurity.io.service.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-public class UserServiceImple implements UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
+public class UserServiceImple implements UserDetailsService, UserService {
+
+    private final UserRepository userRepository;
+
+    private final UserMapper userMapper;
+
+    public UserServiceImple(UserRepository userRepository, UserMapper userMapper) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -23,5 +34,17 @@ public class UserServiceImple implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
         return new UserPrincipal(users);
+    }
+
+    @Override
+    public List<UserRequest> getAllUser() {
+        List<Users> users = userRepository.findAll();
+        return users.stream().map(userMapper::toDto).toList();
+    }
+
+    @Override
+    public UserRequest getUser(Long id) {
+        Users user = userRepository.findById(id).orElseThrow(()->new RuntimeException("User not found with this id"));
+        return userMapper.toDto(user);
     }
 }

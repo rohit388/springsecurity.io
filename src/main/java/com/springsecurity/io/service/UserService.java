@@ -2,6 +2,7 @@ package com.springsecurity.io.service;
 
 import com.springsecurity.io.config.JwtService;
 import com.springsecurity.io.dto.LoginRequest;
+import com.springsecurity.io.dto.UserRequest;
 import com.springsecurity.io.entity.Users;
 import com.springsecurity.io.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,27 +12,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Service
-public class UserService {
-
-    @Autowired
-    private UserRepository userRepository;
+import java.util.List;
 
 
-//    public UserService(BCryptPasswordEncoder bCryptPasswordEncoder) {
-//        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-//    }
-
-//    public Users register(Users users){
-//        users.setPassword(bCryptPasswordEncoder.encode(users.getPassword()));
-//      return  userRepository.save(users);
-//    }
-
-//    public String verify(LoginRequest users) {
-//        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(users.getUsername(),users.getPassword()));
-//        if(authentication.isAuthenticated()){
-//           return jwtService.generateToken(users.getUsername());
-//        }
-//        return "fail";
-//    }
+public interface UserService {
+    List<UserRequest>getAllUser();
+    UserRequest getUser(Long id);
 }

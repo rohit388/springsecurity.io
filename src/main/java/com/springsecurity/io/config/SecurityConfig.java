@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -33,15 +32,10 @@ public class SecurityConfig {
        return http
                 .csrf(customizer->customizer.disable())
                 .authorizeHttpRequests(request->request
-                        .requestMatchers("register","login")
-                        .permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/student/**",
+                                "/api/expense/**","/api/users/**").authenticated()
                         .anyRequest().authenticated())
-        /* Enables default form-based login in Spring Security.
-           This will generate a login form automatically and handle authentication for you.
-           Equivalent to calling formLogin().loginPage("/login") with default settings.
-
-                .formLogin(Customizer.withDefaults())*/
-
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -50,7 +44,11 @@ public class SecurityConfig {
 
 
     }
+    /* Enables default form-based login in Spring Security.
+                       This will generate a login form automatically and handle authentication for you.
+                       Equivalent to calling formLogin().loginPage("/login") with default settings.
 
+                       .formLogin(Customizer.withDefaults())*/
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -73,6 +71,11 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 }

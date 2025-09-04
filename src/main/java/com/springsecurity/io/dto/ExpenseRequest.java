@@ -7,6 +7,8 @@ import java.time.LocalDate;
 @Data
 public class ExpenseRequest {
 
+    private Long id;
+
     private String description;
 
     private Double amount;

@@ -52,10 +52,10 @@ public class AuthServiceImple implements AuthService {
     public String verify(LoginRequest users) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        users.getUsername(),
+                        users.getEmail(),
                         users.getPassword()));
         if(authentication.isAuthenticated()){
-            return jwtService.generateToken(users.getUsername());
+            return jwtService.generateToken(users.getEmail());
         }
         throw new RuntimeException("Invalid credentials");
     }

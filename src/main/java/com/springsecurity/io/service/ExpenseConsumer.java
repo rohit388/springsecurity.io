@@ -11,7 +11,8 @@ public class ExpenseConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(ExpenseConsumer.class);
 
-    @KafkaListener(topics = "expense-events",groupId = "expense-group")
+
+    @KafkaListener(topics = "${kafka.topic.expense-events}",groupId = "${kafka.group.expense-group}")
     public void sendNotification(ConsumerRecord<String,String>record) {
         logger.info("📩 Consumed expense event:");
         logger.info("   Key   = {}", record.key());

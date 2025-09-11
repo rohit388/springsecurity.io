@@ -6,13 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springsecurity.io.dto.ExpenseRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ExpenseProducer {
 
-    private static final String TOPIC  = "expense-events";
+    @Value("${kafka.topic.expense-events}")
+    private String TOPIC;
     private static final Logger logger = LoggerFactory.getLogger(ExpenseProducer.class);
 
     private final KafkaTemplate<String, String> kafkaTemplate;

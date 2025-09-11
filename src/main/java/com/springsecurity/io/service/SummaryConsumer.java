@@ -10,7 +10,7 @@ public class SummaryConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(SummaryConsumer.class);
 
-    @KafkaListener(topics = "expense-events", groupId = "summary-group")
+    @KafkaListener(topics = "${kafka.topic.expense-events}", groupId = "${kafka.group.summary-group}")
     public void updateSummary(String event){
         logger.info("📊 Updating Summary: {}", event);
     }

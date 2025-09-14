@@ -2,6 +2,7 @@ package com.springsecurity.io.service.imple;
 
 import com.springsecurity.io.dto.UserRequest;
 import com.springsecurity.io.entity.Users;
+import com.springsecurity.io.exception.ResourceNotFoundException;
 import com.springsecurity.io.mapper.UserMapper;
 import com.springsecurity.io.model.UserPrincipal;
 import com.springsecurity.io.repo.UserRepository;
@@ -44,7 +45,8 @@ public class UserServiceImple implements UserDetailsService, UserService {
 
     @Override
     public UserRequest getUser(Long id) {
-        Users user = userRepository.findById(id).orElseThrow(()->new RuntimeException("User not found with this id"));
+        Users user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         return userMapper.toDto(user);
     }
 }
+

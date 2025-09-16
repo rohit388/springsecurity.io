@@ -2,10 +2,11 @@ package com.springsecurity.io.controller;
 
 import com.springsecurity.io.dto.UserRequest;
 import com.springsecurity.io.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -18,8 +19,8 @@ public class UserController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<UserRequest>>getAllUser(){
-        return ResponseEntity.ok(userService.getAllUser());
+    public ResponseEntity<Page<UserRequest>>getAllUser(Pageable pageable){
+        return ResponseEntity.ok(userService.getAllUser(pageable));
     }
 
     @GetMapping("/{id}")

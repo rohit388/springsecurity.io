@@ -20,6 +20,8 @@ public class Users {
     private String email;
     private String status;
     private String password;
+    private String otp;
+    private LocalDateTime otpExpiryTime;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate

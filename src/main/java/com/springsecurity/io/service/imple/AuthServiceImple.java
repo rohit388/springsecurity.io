@@ -79,7 +79,7 @@ public class AuthServiceImple implements AuthService {
         }
 
         String otp = generateOtp();
-        users.setOtp(null);
+        users.setOtp(otp);
         users.setOtpExpiryTime(LocalDateTime.now().plusMinutes(10));
         userRepository.save(users);
 
@@ -105,6 +105,7 @@ public class AuthServiceImple implements AuthService {
         // Clear OTP after successful verification
         user.setOtp(null);
         user.setOtpExpiryTime(null);
+
         userRepository.save(user);
 
         return jwtService.generateToken(user.getEmail());

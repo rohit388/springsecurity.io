@@ -32,7 +32,7 @@ public class SecurityConfig {
        return http
                 .csrf(customizer->customizer.disable())
                 .authorizeHttpRequests(request->request
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/v1/resume/upload", "/api/v1/resume/generate").permitAll()
                         .requestMatchers("/api/student/**",
                                 "/api/expense/**","/api/users/**").authenticated()
                         .anyRequest().authenticated())

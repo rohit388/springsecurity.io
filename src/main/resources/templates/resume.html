@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Resume</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            font-size: 12px;
+        }
+        .container {
+            width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .name {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .title {
+            font-size: 18px;
+            font-style: italic;
+        }
+        .contact-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .experience-item {
+            margin-bottom: 10px;
+        }
+        .experience-title {
+            font-weight: bold;
+        }
+        .experience-company {
+            font-style: italic;
+        }
+        .experience-duration {
+            float: right;
+        }
+        .education-item {
+            margin-bottom: 10px;
+        }
+        .education-degree {
+            font-weight: bold;
+        }
+        .education-university {
+            font-style: italic;
+        }
+        .education-duration {
+            float: right;
+        }
+        .skills {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="name" th:text="${resume.name}"></div>
+            <div class="title" th:text="${resume.title}"></div>
+        </div>
+        <div class="contact-info">
+            <span th:text="${resume.email}"></span> |
+            <span th:text="${resume.phone}"></span> |
+            <span th:text="${resume.linkedin}"></span> |
+            <span th:text="${resume.github}"></span>
+        </div>
+        <div class="section">
+            <div class="section-title">Summary</div>
+            <div th:text="${resume.summary}"></div>
+        </div>
+        <div class="section">
+            <div class="section-title">Key Projects</div>
+            <div class="experience-item" th:each="project : ${resume.projects}">
+                <table style="width: 100%;">
+                    <tr>
+                        <td class="experience-title" th:text="${project.title}"></td>
+                        <td style="text-align: right;" th:text="${project.duration}"></td>
+                    </tr>
+                </table>
+                <div th:text="${project.description}"></div>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">Education</div>
+            <div class="education-item">
+                <div class="education-degree" th:text="${resume.education_degree}"></div>
+                <div class="education-university" th:text="${resume.education_university}"></div>
+                <div class="education-duration" th:text="${resume.education_duration}"></div>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">Skills</div>
+            <div class="skills" th:text="${resume.skills}"></div>
+        </div>
+        <div class="section">
+            <div class="section-title">ATS Score</div>
+            <div th:text="${resume.atsScore} + ' / 100'"></div>
+        </div>
+    </div>
+</body>
+</html>

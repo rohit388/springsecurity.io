@@ -15,10 +15,12 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,42 +32,12 @@ public class ResumeController {
     private SpringTemplateEngine templateEngine;
 
     @GetMapping("/generate")
-    public ResponseEntity<byte[]> generateResume() {
+    public ResponseEntity<byte[]> generateResume() throws IOException {
         // Create a Thymeleaf context
         Context context = new Context();
 
         // Create a map to hold the resume data
-        Map<String, Object> resumeData = new HashMap<>();
-        resumeData.put("name", "Rohit Kumar");
-        resumeData.put("title", "Java Developer");
-        resumeData.put("email", "rky84777@gmail.com");
-        resumeData.put("phone", "+919759298040");
-        resumeData.put("linkedin", "linkedin.com/in/rohit-yadav-1a176a1b0");
-        resumeData.put("github", ""); // No GitHub provided, leave empty
-        resumeData.put("summary", "Java Developer with 3+ years of experience in designing, developing, and maintaining scalable backend systems. Proficient in Java, Spring Boot, Spring Security, JPA/Hibernate, and Micro services, with strong expertise in REST API development and Kafka-based messaging systems. Skilled in database design (MySQL, PostgreSQL), CI/CD pipelines (Jenkins), and implementing secure, maintainable, and efficient code using Java 8+ features (Lambdas, Streams, Functional Interfaces). Adept at working in Agile environments and delivering high-quality, production-ready solutions.");
-
-        // Create a list of projects
-        List<Map<String, String>> projects = new ArrayList<>();
-
-        Map<String, String> project1 = new HashMap<>();
-        project1.put("title", "Software Engineer, Walking Tree Technologies");
-        project1.put("duration", "Oct 2021 – 18-DEC 2024");
-        project1.put("description", "Engineered REST APIs and micro services using Java, Spring Boot, and Kafka for scalable, production-ready solutions. Performed unit testing using JUnit & Mockito, improving code quality and reducing defects in production. Built and optimized CI/CD pipelines with Jenkins for smooth deployment. Managed relational databases (PostgreSQL, MySQL) by writing optimized queries and designing schemas. Ensured secure API implementation using JWT authentication and followed best practices for code maintainability.");
-        projects.add(project1);
-
-        Map<String, String> project2 = new HashMap<>();
-        project2.put("title", "Key Project: Shuttle Booking Application");
-        project2.put("duration", "Sept 2024 – Nov 2024");
-        project2.put("description", "Architected a Spring Boot micro services-based solution for shuttle booking available in Dubai, Saudi Arabia, Kuwait. Implemented campaign management APIs (promotions, daily/weekly/monthly subscriptions). Tech Stack: JDK 17, Spring Boot, JPA, PostgreSQL, Micro services, AWS, Gradle, Git, Postman");
-        projects.add(project2);
-
-        resumeData.put("projects", projects);
-
-        resumeData.put("education_degree", "Bachelor of Technology in Computer science");
-        resumeData.put("education_university", "Invertis University, Bareilly (UP)");
-        resumeData.put("education_duration", "Aug 2017 – 2021");
-        resumeData.put("skills", "Languages & Frameworks: Java, J2EE, Spring Boot, Spring Security, Hibernate, JPA. Databases: MySQL, PostgreSQL. Messaging & Tools: Apache Kafka, Azure Functions, Dockers, Git, Jenkins. Testing: JUnit, Mockito. Architectures: Micro services, Restful APIs. Methodologies: Agile, CI/CD, Version Control (Git).");
-
+        Map<String, Object> resumeData = loadResumeData();
 
         // Add the resume data to the context
         context.setVariable("resume", resumeData);
@@ -93,6 +65,37 @@ public class ResumeController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(outputStream.toByteArray());
+    }
+
+    private Map<String, Object> loadResumeData() throws IOException {
+        Properties properties = new Properties();
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("resume.txt")) {
+            if (is == null) {
+                throw new IOException("resume.txt not found");
+            }
+            properties.load(is);
+        }
+
+        Map<String, Object> resumeData = new HashMap<>();
+        for (String key : properties.stringPropertyNames()) {
+            resumeData.put(key, properties.getProperty(key));
+        }
+
+        List<Map<String, String>> projects = new ArrayList<>();
+        for (int i = 1; ; i++) {
+            String titleKey = "projects." + i + ".title";
+            if (!properties.containsKey(titleKey)) {
+                break;
+            }
+            Map<String, String> project = new HashMap<>();
+            project.put("title", properties.getProperty(titleKey));
+            project.put("duration", properties.getProperty("projects." + i + ".duration"));
+            project.put("description", properties.getProperty("projects." + i + ".description"));
+            projects.add(project);
+        }
+        resumeData.put("projects", projects);
+
+        return resumeData;
     }
 
     private int calculateAtsScore(Map<String, Object> resumeData) {

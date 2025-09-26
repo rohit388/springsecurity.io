@@ -68,47 +68,63 @@ public class ResumeController {
     }
 
     private Map<String, Object> loadResumeData() throws IOException {
-        Properties properties = new Properties();
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream("resume.txt")) {
-            if (is == null) {
-                throw new IOException("resume.txt not found");
-            }
-            properties.load(is);
-        }
+      Properties properties = new Properties();
+      try (InputStream is = getClass().getClassLoader().getResourceAsStream("resume.txt")) {
+          if (is == null) {
+              throw new IOException("resume.txt not found");
+          }
+          properties.load(is);
+      }
 
-        Map<String, Object> resumeData = new HashMap<>();
-        for (String key : properties.stringPropertyNames()) {
-            if (key.equals("skills")) {
-                String skillsString = properties.getProperty(key);
-                List<String> skillsList = new ArrayList<>();
-                if (skillsString != null && !skillsString.isEmpty()) {
-                    String[] skillsArray = skillsString.split("[,:]");
-                    for (String skill : skillsArray) {
-                        skillsList.add(skill.trim());
-                    }
-                }
-                resumeData.put(key, skillsList);
-            } else {
-                resumeData.put(key, properties.getProperty(key));
-            }
-        }
+      Map<String, Object> resumeData = new HashMap<>();
+      for (String key : properties.stringPropertyNames()) {
+          if (key.equals("skills")) {
+              String skillsString = properties.getProperty(key);
+              List<String> skillsList = new ArrayList<>();
+              if (skillsString != null && !skillsString.isEmpty()) {
+                  String[] skillsArray = skillsString.split("[,:]");
+                  for (String skill : skillsArray) {
+                      skillsList.add(skill.trim());
+                  }
+              }
+              resumeData.put(key, skillsList);
+          } else {
+              resumeData.put(key, properties.getProperty(key));
+          }
+      }
 
-        List<Map<String, String>> projects = new ArrayList<>();
-        for (int i = 1; ; i++) {
-            String titleKey = "projects." + i + ".title";
-            if (!properties.containsKey(titleKey)) {
-                break;
-            }
-            Map<String, String> project = new HashMap<>();
-            project.put("title", properties.getProperty(titleKey));
-            project.put("duration", properties.getProperty("projects." + i + ".duration"));
-            project.put("description", properties.getProperty("projects." + i + ".description"));
-            projects.add(project);
-        }
-        resumeData.put("projects", projects);
+      List<Map<String, String>> projects = new ArrayList<>();
+      for (int i = 1; ; i++) {
+          String titleKey = "projects." + i + ".title";
+          if (!properties.containsKey(titleKey)) {
+              break;
+          }
+          Map<String, String> project = new HashMap<>();
+          project.put("title", properties.getProperty(titleKey));
+          project.put("duration", properties.getProperty("projects." + i + ".duration"));
 
-        return resumeData;
-    }
+          String description = properties.getProperty("projects." + i + ".description");
+          String techStackKey1 = "projects." + i + ".tech";
+          String techStackKey2 = "projects." + i + ".Tech Stack";
+
+          String techStack = null;
+          if (properties.containsKey(techStackKey1)) {
+              techStack = properties.getProperty(techStackKey1);
+          } else if (properties.containsKey(techStackKey2)) {
+              techStack = properties.getProperty(techStackKey2);
+          }
+
+          if (techStack != null) {
+              description += "\n\n" + techStack;
+          }
+          project.put("description", description);
+
+          projects.add(project);
+      }
+      resumeData.put("projects", projects);
+
+      return resumeData;
+  }
 
     private int calculateAtsScore(Map<String, Object> resumeData) {
         int score = 0;

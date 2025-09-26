@@ -78,7 +78,19 @@ public class ResumeController {
 
         Map<String, Object> resumeData = new HashMap<>();
         for (String key : properties.stringPropertyNames()) {
-            resumeData.put(key, properties.getProperty(key));
+            if (key.equals("skills")) {
+                String skillsString = properties.getProperty(key);
+                List<String> skillsList = new ArrayList<>();
+                if (skillsString != null && !skillsString.isEmpty()) {
+                    String[] skillsArray = skillsString.split("[,:]");
+                    for (String skill : skillsArray) {
+                        skillsList.add(skill.trim());
+                    }
+                }
+                resumeData.put(key, skillsList);
+            } else {
+                resumeData.put(key, properties.getProperty(key));
+            }
         }
 
         List<Map<String, String>> projects = new ArrayList<>();
@@ -101,9 +113,9 @@ public class ResumeController {
     private int calculateAtsScore(Map<String, Object> resumeData) {
         int score = 0;
         String summary = (String) resumeData.get("summary");
-        String skills = (String) resumeData.get("skills");
+        List<String> skills = (List<String>) resumeData.get("skills");
 
-        String combinedText = (summary + " " + skills).toLowerCase();
+        String combinedText = (summary + " " + String.join(" ", skills)).toLowerCase();
 
         if (combinedText.contains("java")) score += 15;
         if (combinedText.contains("spring boot")) score += 15;
@@ -187,7 +199,18 @@ public class ResumeController {
 
         // Extract sections
         resumeData.put("summary", extractSection(sanitizedText, "Summary", "Experience"));
-        resumeData.put("skills", extractSection(sanitizedText, "Skills", "Experience"));
+        String skillsSection = extractSection(sanitizedText, "Skills", "Experience");
+        List<String> skillsList = new ArrayList<>();
+        if (skillsSection != null && !skillsSection.isEmpty()) {
+            String[] skillsArray = skillsSection.split("[,:\\n]+");
+            for (String skill : skillsArray) {
+                String trimmedSkill = skill.trim();
+                if (!trimmedSkill.isEmpty()) {
+                    skillsList.add(trimmedSkill);
+                }
+            }
+        }
+        resumeData.put("skills", skillsList);
 
         // For simplicity, we are not parsing experience and education in detail here.
         // A more advanced implementation would be needed for that.

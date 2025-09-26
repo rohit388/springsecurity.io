@@ -245,19 +245,56 @@ public class ResumeController {
         }
         resumeData.put("skills", skillsList);
 
-        // For simplicity, we are not parsing experience and education in detail here.
-        // A more advanced implementation would be needed for that.
-        resumeData.put("experience1_title", "");
-        resumeData.put("experience1_company", "");
-        resumeData.put("experience1_duration", "");
-        resumeData.put("experience1_description", "");
-        resumeData.put("experience2_title", "");
-        resumeData.put("experience2_company", "");
-        resumeData.put("experience2_duration", "");
-        resumeData.put("experience2_description", "");
-        resumeData.put("education_degree", "");
-        resumeData.put("education_university", "");
-        resumeData.put("education_duration", "");
+        // Parse Experience section
+        String experienceSection = extractSection(sanitizedText, "Experience", "Education");
+        List<Map<String, String>> experiences = new ArrayList<>();
+        if (experienceSection != null && !experienceSection.isEmpty()) {
+            // This is a very simplified approach to parsing experiences.
+            // A more robust solution would require more advanced NLP techniques.
+            String[] experienceEntries = experienceSection.split("\n\n"); // Assuming double newline separates entries
+            for (String entry : experienceEntries) {
+                Map<String, String> experience = new HashMap<>();
+                String[] lines = entry.split("\n");
+                if (lines.length > 0) {
+                    experience.put("title", lines[0]);
+                }
+                if (lines.length > 1) {
+                    experience.put("company", lines[1]);
+                }
+                if (lines.length > 2) {
+                    experience.put("duration", lines[2]);
+                }
+                if (lines.length > 3) {
+                    experience.put("description", lines[3]);
+                }
+                experiences.add(experience);
+            }
+        }
+        // This will be used to populate the projects in the template
+        resumeData.put("projects", experiences);
+
+
+        // Parse Education section
+        String educationSection = extractSection(sanitizedText, "Education", "Skills");
+        List<Map<String, String>> educations = new ArrayList<>();
+        if (educationSection != null && !educationSection.isEmpty()) {
+            String[] educationEntries = educationSection.split("\n\n"); // Assuming double newline separates entries
+            for (String entry : educationEntries) {
+                Map<String, String> education = new HashMap<>();
+                String[] lines = entry.split("\n");
+                if (lines.length > 0) {
+                    education.put("degree", lines[0]);
+                }
+                if (lines.length > 1) {
+                    education.put("university", lines[1]);
+                }
+                if (lines.length > 2) {
+                    education.put("duration", lines[2]);
+                }
+                educations.add(education);
+            }
+        }
+        resumeData.put("educations", educations);
 
 
         return resumeData;

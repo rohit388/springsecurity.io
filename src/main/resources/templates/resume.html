@@ -47,19 +47,23 @@
             margin-bottom: 10px;
         }
         .item-header {
-            display: flex;
-            justify-content: space-between;
             font-weight: bold;
+            overflow: auto;
+        }
+
+        .item-header span:first-child {
+            float: left;
+        }
+
+        .item-header span:last-child {
+            float: right;
         }
         .item-description {
             margin-top: 5px;
             word-wrap: break-word;
             white-space: pre-wrap;
         }
-        .ats-score {
-            font-weight: bold;
-            font-size: 16px;
-        }
+
     </style>
 </head>
 <body>
@@ -94,12 +98,12 @@
 
     <div class="section">
         <h2 class="section-title">Education</h2>
-        <div class="education-item">
+        <div class="education-item" th:each="education : ${resume.educations}">
             <div class="item-header">
-                <span th:text="${resume.education_degree}"></span>
-                <span th:text="${resume.education_duration}"></span>
+                <span th:text="${education.degree}"></span>
+                <span th:text="${education.duration}"></span>
             </div>
-            <div class="item-description" th:text="${resume.education_university}"></div>
+            <div class="item-description" th:text="${education.university}"></div>
         </div>
     </div>
 
@@ -112,10 +116,7 @@
         </div>
     </div>
 
-    <div class="section">
-        <h2 class="section-title">ATS Score</h2>
-        <div class="ats-score" th:text="'ATS Score: ' + ${resume.atsScore} + ' / 100'"></div>
-    </div>
+
 </div>
 </body>
 </html>

@@ -88,7 +88,7 @@ public class ResumeController {
                   }
               }
               resumeData.put(key, skillsList);
-          } else {
+          } else if (!key.startsWith("projects.") && !key.startsWith("education.")) { // Exclude project and education properties from being added directly
               resumeData.put(key, properties.getProperty(key));
           }
       }
@@ -123,6 +123,20 @@ public class ResumeController {
       }
       resumeData.put("projects", projects);
 
+      List<Map<String, String>> educations = new ArrayList<>();
+      for (int i = 1; ; i++) {
+          String degreeKey = "education." + i + ".degree";
+          if (!properties.containsKey(degreeKey)) {
+              break;
+          }
+          Map<String, String> education = new HashMap<>();
+          education.put("degree", properties.getProperty(degreeKey));
+          education.put("university", properties.getProperty("education." + i + ".university"));
+          education.put("duration", properties.getProperty("education." + i + ".duration"));
+          educations.add(education);
+      }
+      resumeData.put("educations", educations);
+
       return resumeData;
   }
 
@@ -152,6 +166,9 @@ public class ResumeController {
         if (combinedText.contains("mockito")) score += 5;
         if (combinedText.contains("ci/cd")) score += 15;
         if (combinedText.contains("azure")) score += 5;
+
+        score = Math.max(score, 85);
+        score = Math.min(score, 100);
 
         return score;
     }

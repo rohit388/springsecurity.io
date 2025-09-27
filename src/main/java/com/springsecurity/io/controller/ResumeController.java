@@ -92,6 +92,9 @@ public class ResumeController {
               resumeData.put(key, properties.getProperty(key));
           }
       }
+      if (!resumeData.containsKey("github") || resumeData.get("github").toString().isEmpty()) {
+          resumeData.put("github", "Not Available");
+      }
 
       List<Map<String, String>> projects = new ArrayList<>();
       for (int i = 1; ; i++) {

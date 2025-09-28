@@ -150,27 +150,30 @@ public class ResumeController {
 
         String combinedText = (summary + " " + String.join(" ", skills)).toLowerCase();
 
-        if (combinedText.contains("java")) score += 15;
-        if (combinedText.contains("spring boot")) score += 15;
+        if (combinedText.contains("java")) score += 20;
+        if (combinedText.contains("spring boot")) score += 20;
         if (combinedText.contains("spring security")) score += 15;
-        if (combinedText.contains("hibernate")) score += 15;
-        if (combinedText.contains("jpa")) score += 15;
+        if (combinedText.contains("hibernate")) score += 10;
+        if (combinedText.contains("jpa")) score += 10;
         if (combinedText.contains("microservices") || combinedText.contains("micro services")) score += 20;
-        if (combinedText.contains("rest api") || combinedText.contains("restful api")) score += 5;
+        if (combinedText.contains("rest api") || combinedText.contains("restful api")) score += 10;
         if (combinedText.contains("kafka")) score += 15;
         if (combinedText.contains("mysql")) score += 5;
         if (combinedText.contains("postgresql")) score += 5;
-        if (combinedText.contains("jenkins")) score += 5;
+        if (combinedText.contains("jenkins")) score += 10;
         if (combinedText.contains("git")) score += 5;
         if (combinedText.contains("agile")) score += 5;
-        if (combinedText.contains("docker") || combinedText.contains("dockers")) score += 5;
+        if (combinedText.contains("docker") || combinedText.contains("dockers")) score += 10;
         if (combinedText.contains("j2ee")) score += 5;
         if (combinedText.contains("junit")) score += 5;
         if (combinedText.contains("mockito")) score += 5;
         if (combinedText.contains("ci/cd")) score += 15;
-        if (combinedText.contains("azure")) score += 5;
+        if (combinedText.contains("azure")) score += 10;
+        if (combinedText.contains("aws")) score += 10;
+        if (combinedText.contains("gcp")) score += 10;
+        if (combinedText.contains("kubernetes")) score += 10;
 
-        score = Math.max(score, 85);
+        score = Math.max(score, 90);
         score = Math.min(score, 100);
 
         return score;

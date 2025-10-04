@@ -98,6 +98,11 @@
             white-space: pre-wrap;
             color: #555;
         }
+        .item-tech-stack {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -134,6 +139,9 @@
                     <span th:text="${project.duration}"></span>
                 </div>
                 <div class="item-description" th:text="${project.description}"></div>
+                <div class="item-tech-stack" th:if="${project.containsKey('tech')}">
+                    <strong>Tech Stack:</strong> <span th:text="${project.tech}"></span>
+                </div>
             </div>
         </div>
         <div class="section">

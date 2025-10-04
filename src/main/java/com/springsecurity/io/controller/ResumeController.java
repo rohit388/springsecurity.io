@@ -54,6 +54,7 @@ public class ResumeController {
         HtmlConverter.convertToPdf(html, outputStream);
 
         // Set the response headers
+
         ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
                 .filename("resume.pdf")
                 .build();
@@ -77,21 +78,19 @@ public class ResumeController {
       }
 
       Map<String, Object> resumeData = new HashMap<>();
+      Map<String, List<String>> skills = new HashMap<>();
       for (String key : properties.stringPropertyNames()) {
-          if (key.equals("skills")) {
+          if (key.startsWith("skills.")) {
+              String category = key.substring(7);
               String skillsString = properties.getProperty(key);
-              List<String> skillsList = new ArrayList<>();
               if (skillsString != null && !skillsString.isEmpty()) {
-                  String[] skillsArray = skillsString.split("[,:]");
-                  for (String skill : skillsArray) {
-                      skillsList.add(skill.trim());
-                  }
+                  skills.put(category, List.of(skillsString.split(",")));
               }
-              resumeData.put(key, skillsList);
-          } else if (!key.startsWith("projects.") && !key.startsWith("education.")) { // Exclude project and education properties from being added directly
+          } else if (!key.startsWith("projects.") && !key.startsWith("education.")) {
               resumeData.put(key, properties.getProperty(key));
           }
       }
+      resumeData.put("skills", skills);
       if (!resumeData.containsKey("github") || resumeData.get("github").toString().isEmpty()) {
           resumeData.put("github", "Not Available");
       }
@@ -106,7 +105,7 @@ public class ResumeController {
           project.put("title", properties.getProperty(titleKey));
           project.put("duration", properties.getProperty("projects." + i + ".duration"));
 
-          String description = properties.getProperty("projects." + i + ".description");
+          project.put("description", properties.getProperty("projects." + i + ".description"));
           String techStackKey1 = "projects." + i + ".tech";
           String techStackKey2 = "projects." + i + ".Tech Stack";
 
@@ -116,11 +115,7 @@ public class ResumeController {
           } else if (properties.containsKey(techStackKey2)) {
               techStack = properties.getProperty(techStackKey2);
           }
-
-          if (techStack != null) {
-              description += "\n\n" + techStack;
-          }
-          project.put("description", description);
+          project.put("tech", techStack);
 
           projects.add(project);
       }
@@ -146,9 +141,18 @@ public class ResumeController {
     private int calculateAtsScore(Map<String, Object> resumeData) {
         int score = 0;
         String summary = (String) resumeData.get("summary");
-        List<String> skills = (List<String>) resumeData.get("skills");
+        Map<String, List<String>> skills = (Map<String, List<String>>) resumeData.get("skills");
 
-        String combinedText = (summary + " " + String.join(" ", skills)).toLowerCase();
+        StringBuilder skillsText = new StringBuilder();
+        if (skills != null) {
+            for (List<String> skillList : skills.values()) {
+                for (String skill : skillList) {
+                    skillsText.append(skill).append(" ");
+                }
+            }
+        }
+
+        String combinedText = (summary + " " + skillsText.toString()).toLowerCase();
 
         if (combinedText.contains("java")) score += 15;
         if (combinedText.contains("spring boot")) score += 15;
@@ -236,17 +240,27 @@ public class ResumeController {
         // Extract sections
         resumeData.put("summary", extractSection(sanitizedText, "Summary", "Experience"));
         String skillsSection = extractSection(sanitizedText, "Skills", "Experience");
-        List<String> skillsList = new ArrayList<>();
+        Map<String, List<String>> skills = new HashMap<>();
         if (skillsSection != null && !skillsSection.isEmpty()) {
-            String[] skillsArray = skillsSection.split("[,:\\n]+");
-            for (String skill : skillsArray) {
-                String trimmedSkill = skill.trim();
-                if (!trimmedSkill.isEmpty()) {
-                    skillsList.add(trimmedSkill);
+            String[] lines = skillsSection.split("\\n");
+            String currentCategory = "Uncategorized";
+            List<String> currentSkills = new ArrayList<>();
+            for (String line : lines) {
+                if (line.endsWith(":")) {
+                    if (!currentSkills.isEmpty()) {
+                        skills.put(currentCategory, currentSkills);
+                    }
+                    currentCategory = line.substring(0, line.length() - 1);
+                    currentSkills = new ArrayList<>();
+                } else {
+                    currentSkills.add(line.trim());
                 }
             }
+            if (!currentSkills.isEmpty()) {
+                skills.put(currentCategory, currentSkills);
+            }
         }
-        resumeData.put("skills", skillsList);
+        resumeData.put("skills", skills);
 
         // Parse Experience section
         String experienceSection = extractSection(sanitizedText, "Experience", "Education");

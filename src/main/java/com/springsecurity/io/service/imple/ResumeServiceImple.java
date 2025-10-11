@@ -97,47 +97,105 @@ public class ResumeServiceImple implements ResumeService {
     }
 
     @Override
-    public byte[] generateResumePdf(Map<String, Object> resumeData) throws IOException {
+    public byte[] generateResumePdf(Map<String, Object> resumeData, String profile) throws IOException {
         Context context = new Context();
+
+        List<String> keywordsToHighlight = Arrays.asList("Java", "Spring Boot", "Kafka", "JUnit", "Mockito", "PostgreSQL", "MySQL", "CI/CD", "Tech Stack:", "Cosmos DB", "Microservices", "Jira");
+
+        String summary = (String) resumeData.get("summary");
+        resumeData.put("summary", highlightKeywords(summary, keywordsToHighlight));
+
+        List<String> skills = (List<String>) resumeData.get("skills");
+        if (skills != null) {
+            List<String> highlightedSkills = new ArrayList<>();
+            for (String skill : skills) {
+                highlightedSkills.add(highlightKeywords(skill, keywordsToHighlight));
+            }
+            resumeData.put("skills", highlightedSkills);
+        }
+
+        List<Map<String, String>> projects = (List<Map<String, String>>) resumeData.get("projects");
+        if (projects != null) {
+            for (Map<String, String> project : projects) {
+                String description = project.get("description");
+                project.put("description", highlightKeywords(description, keywordsToHighlight));
+                String tech = project.get("tech");
+                project.put("tech", highlightKeywords(tech, keywordsToHighlight));
+            }
+        }
+
         context.setVariable("resume", resumeData);
 
-        int atsScore = calculateAtsScore(resumeData);
+        int atsScore = calculateAtsScore(resumeData, profile);
         resumeData.put("atsScore", atsScore);
 
-        String html = templateEngine.process("resume", context);
+        String templateName = "resume";
+        if (profile != null) {
+            templateName = "resume-" + profile;
+        }
+
+        String html = templateEngine.process(templateName, context);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         HtmlConverter.convertToPdf(html, outputStream);
         return outputStream.toByteArray();
     }
 
-    @Override
-    public int calculateAtsScore(Map<String, Object> resumeData) {
+    private String highlightKeywords(String text, List<String> keywords) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        String highlightedText = text;
+        for (String keyword : keywords) {
+            highlightedText = highlightedText.replaceAll("(?i)\\b(" + keyword + ")\\b", "<span class='highlight'>$1</span>");
+        }
+        return highlightedText;
+    }
+
+    public int calculateAtsScore(Map<String, Object> resumeData, String profile) {
         int score = 0;
         String summary = (String) resumeData.get("summary");
         List<String> skills = (List<String>) resumeData.get("skills");
 
         String combinedText = (summary + " " + String.join(" ", skills)).toLowerCase();
 
-        if (combinedText.contains("java")) score += 15;
-        if (combinedText.contains("spring boot")) score += 15;
-        if (combinedText.contains("spring security")) score += 15;
-        if (combinedText.contains("hibernate")) score += 15;
-        if (combinedText.contains("jpa")) score += 15;
-        if (combinedText.contains("microservices") || combinedText.contains("micro services")) score += 20;
-        if (combinedText.contains("rest api") || combinedText.contains("restful api")) score += 5;
-        if (combinedText.contains("kafka")) score += 15;
-        if (combinedText.contains("mysql")) score += 5;
-        if (combinedText.contains("postgresql")) score += 5;
-        if (combinedText.contains("jenkins")) score += 5;
-        if (combinedText.contains("git")) score += 5;
-        if (combinedText.contains("agile")) score += 5;
-        if (combinedText.contains("docker") || combinedText.contains("dockers")) score += 5;
-        if (combinedText.contains("j2ee")) score += 5;
-        if (combinedText.contains("junit")) score += 5;
-        if (combinedText.contains("mockito")) score += 5;
-        if (combinedText.contains("ci/cd")) score += 15;
-        if (combinedText.contains("azure")) score += 5;
+        if ("backend".equals(profile)) {
+            if (combinedText.contains("java")) score += 20;
+            if (combinedText.contains("spring boot")) score += 20;
+            if (combinedText.contains("spring security")) score += 20;
+            if (combinedText.contains("hibernate")) score += 20;
+            if (combinedText.contains("jpa")) score += 20;
+        } else if ("frontend".equals(profile)) {
+            if (combinedText.contains("javascript")) score += 20;
+            if (combinedText.contains("react")) score += 20;
+            if (combinedText.contains("angular")) score += 20;
+            if (combinedText.contains("vue")) score += 20;
+        } else if ("devops".equals(profile)) {
+            if (combinedText.contains("docker")) score += 20;
+            if (combinedText.contains("jenkins")) score += 20;
+            if (combinedText.contains("kubernetes")) score += 20;
+            if (combinedText.contains("aws")) score += 20;
+        } else { // fullstack or default
+            if (combinedText.contains("java")) score += 15;
+            if (combinedText.contains("spring boot")) score += 15;
+            if (combinedText.contains("spring security")) score += 15;
+            if (combinedText.contains("hibernate")) score += 15;
+            if (combinedText.contains("jpa")) score += 15;
+            if (combinedText.contains("microservices") || combinedText.contains("micro services")) score += 20;
+            if (combinedText.contains("rest api") || combinedText.contains("restful api")) score += 5;
+            if (combinedText.contains("kafka")) score += 15;
+            if (combinedText.contains("mysql")) score += 5;
+            if (combinedText.contains("postgresql")) score += 5;
+            if (combinedText.contains("jenkins")) score += 5;
+            if (combinedText.contains("git")) score += 5;
+            if (combinedText.contains("agile")) score += 5;
+            if (combinedText.contains("docker") || combinedText.contains("dockers")) score += 5;
+            if (combinedText.contains("j2ee")) score += 5;
+            if (combinedText.contains("junit")) score += 5;
+            if (combinedText.contains("mockito")) score += 5;
+            if (combinedText.contains("ci/cd")) score += 15;
+            if (combinedText.contains("azure")) score += 5;
+        }
 
         score = Math.max(score, 85);
         score = Math.min(score, 100);

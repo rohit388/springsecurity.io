@@ -100,7 +100,7 @@ public class ResumeServiceImple implements ResumeService {
     public byte[] generateResumePdf(Map<String, Object> resumeData, String profile) throws IOException {
         Context context = new Context();
 
-        List<String> keywordsToHighlight = Arrays.asList("Java", "Spring Boot", "Kafka", "JUnit", "Mockito", "PostgreSQL", "MySQL", "CI/CD", "Tech Stack:", "Cosmos DB", "Microservices", "Jira");
+        List<String> keywordsToHighlight = Arrays.asList("Java", "Spring Boot", "Kafka", "JUnit", "Mockito", "PostgreSQL", "MySQL", "CI/CD", "Tech Stack:", "Cosmos DB", "Microservices", "Jira", "Lambdas", "Streams", "Functional Interfaces");
 
         String summary = (String) resumeData.get("summary");
         resumeData.put("summary", highlightKeywords(summary, keywordsToHighlight));
